@@ -1,0 +1,6 @@
+{
+  "name": "CityConnect | Reliable Cabs, Comfortable Stays & Event Management",
+  "description": "Affordable city taxis, airport cabs, budget-friendly hotel stays, and hassle-free family event planning all in one simple, trusted platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
