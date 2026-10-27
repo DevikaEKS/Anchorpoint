@@ -42,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, onOpenD
               className="flex items-center gap-1.5 text-slate-200 hover:text-sky-300 transition-colors"
             >
               <Phone className="w-3.5 h-3.5 text-sky-400" />
-              <span>+91 90031 63335</span>
+              
             </a>
            
             
@@ -154,19 +154,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, onOpenD
               <Car className="w-4 h-4" />
               <span>Explore All Available Cars</span>
             </button>
-            {onOpenDownload && (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenDownload();
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-colors cursor-pointer"
-              >
-                <Download className="w-4 h-4 text-[#106eea]" />
-               
-              </button>
-            )}
+           
             <a
               href="tel:+919003163335"
               className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
