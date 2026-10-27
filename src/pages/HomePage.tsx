@@ -142,21 +142,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               </div>
 
               {/* Functional tabs */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+              <div className="grid grid-cols-3 items-stretch gap-1 bg-slate-100 p-1 rounded-lg w-full sm:flex sm:w-auto sm:items-center">
                 <button
                   type="button"
                   onClick={() => {
                     setActiveTab('cabs');
                     setFormData((f) => ({ ...f, serviceType: 'Cab Services / Airport Transfer' }));
                   }}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
+                  className={`min-w-0 w-full justify-center px-1.5 py-2 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs text-center font-semibold rounded-md transition-colors cursor-pointer flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 leading-tight ${
                     activeTab === 'cabs'
                       ? 'bg-white text-[#106eea] shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <Car className="w-3.5 h-3.5" />
-                  <span>Cab Services</span>
+                  <span className="min-w-0 break-words">Cab Services</span>
                 </button>
                 <button
                   type="button"
@@ -164,14 +164,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     setActiveTab('hospitality');
                     setFormData((f) => ({ ...f, serviceType: 'Hospitality / The Edge Suites' }));
                   }}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
+                  className={`min-w-0 w-full justify-center px-1.5 py-2 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs text-center font-semibold rounded-md transition-colors cursor-pointer flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 leading-tight ${
                     activeTab === 'hospitality'
                       ? 'bg-white text-[#106eea] shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <Hotel className="w-3.5 h-3.5" />
-                  <span>Hospitality</span>
+                  <span className="min-w-0 break-words">Hospitality</span>
                 </button>
                 <button
                   type="button"
@@ -179,14 +179,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                     setActiveTab('events');
                     setFormData((f) => ({ ...f, serviceType: 'Event Management Coordination' }));
                   }}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
+                  className={`min-w-0 w-full justify-center px-1.5 py-2 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs text-center font-semibold rounded-md transition-colors cursor-pointer flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 leading-tight ${
                     activeTab === 'events'
                       ? 'bg-white text-[#106eea] shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <Calendar className="w-3.5 h-3.5" />
-                  <span>Event Management</span>
+                  <span className="min-w-0 break-words">Event Management</span>
                 </button>
               </div>
             </div>
@@ -209,7 +209,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleQuickSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <form onSubmit={handleQuickSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-w-0">
                 <div>
                   <label className="text-[11px] font-semibold text-slate-700 block mb-1">
                     Your Name *
