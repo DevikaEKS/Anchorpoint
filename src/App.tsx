@@ -1,155 +1,102 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useState } from 'react';
-import { CurrencyCode, NavigationPage, ServiceType } from './types';
+import React, { useState, useEffect } from 'react';
+import { PageId } from './types';
 import { Navbar } from './components/Navbar';
-import { HeroSection } from './components/HeroSection';
-import { FleetSection } from './components/FleetSection';
-import { HospitalitySection } from './components/HospitalitySection';
-import { EventsSection } from './components/EventsSection';
-import { TrinityBundleSection } from './components/TrinityBundleSection';
-import { TestimonialsSection } from './components/TestimonialsSection';
-import { BookingModal } from './components/BookingModal';
-import { ConciergeDrawer } from './components/ConciergeDrawer';
 import { Footer } from './components/Footer';
-import { CabServicePage } from './pages/CabServicePage';
-import { EventManagementPage } from './pages/EventManagementPage';
+import { HomePage } from './pages/HomePage';
+import { CabServicesPage } from './pages/CabServicesPage';
+import { HospitalityPage } from './pages/HospitalityPage';
+import { EventsPage } from './pages/EventsPage';
+import { CarsPage } from './pages/CarsPage';
+import { AboutPage } from './pages/AboutPage';
+import { ContactPage } from './pages/ContactPage';
+import { DownloadModal } from './components/DownloadModal';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<NavigationPage>('home');
-  const [currentCurrency, setCurrentCurrency] = useState<CurrencyCode>('USD');
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [bookingServiceType, setBookingServiceType] = useState<ServiceType>('cab');
-  const [bookingPrefillId, setBookingPrefillId] = useState<string | undefined>(undefined);
-  const [isConciergeOpen, setIsConciergeOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<PageId>('home');
+  const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
-  const navigateTo = (page: NavigationPage) => {
+  // Sync state with URL hash for intuitive navigation & back/forward support
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (!hash) {
+        setCurrentPage('home');
+        return;
+      }
+
+      if (hash.startsWith('cars')) {
+        setCurrentPage('cars');
+        const params = new URLSearchParams(hash.split('?')[1] || '');
+        const id = params.get('id');
+        if (id) {
+          setSelectedCarId(id);
+        }
+      } else if (
+        ['home', 'cabs', 'hospitality', 'events', 'about', 'contact'].includes(
+          hash
+        )
+      ) {
+        setCurrentPage(hash as PageId);
+      }
+    };
+
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const handleNavigate = (page: PageId, carId?: string) => {
     setCurrentPage(page);
+    if (carId) {
+      setSelectedCarId(carId);
+      window.location.hash = `cars?id=${carId}`;
+    } else {
+      if (page === 'cars') {
+        window.location.hash = 'cars';
+      } else if (page === 'home') {
+        window.location.hash = '';
+      } else {
+        window.location.hash = page;
+      }
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleOpenBooking = (service: ServiceType = 'all_in_one', prefillId?: string) => {
-    setBookingServiceType(service);
-    setBookingPrefillId(prefillId);
-    setIsBookingModalOpen(true);
-  };
-
-  const handleSelectVehicle = (vehicleId: string) => {
-    setBookingServiceType('cab');
-    setBookingPrefillId(vehicleId);
-    setIsBookingModalOpen(true);
-  };
-
-  const handleSelectProperty = (propertyId: string) => {
-    setBookingServiceType('hospitality');
-    setBookingPrefillId(propertyId);
-    setIsBookingModalOpen(true);
-  };
-
-  const handleSelectEvent = (eventId: string) => {
-    setBookingServiceType('event');
-    setBookingPrefillId(eventId);
-    setIsBookingModalOpen(true);
-  };
-
   return (
-    <div className="min-h-screen bg-[#090A0F] text-[#F3EFE6] flex flex-col font-sans">
-      {/* Royal Top Bar Navigation */}
+    <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans selection:bg-[#106eea] selection:text-white">
+      {/* Navigation Header */}
       <Navbar
         currentPage={currentPage}
-        onNavigate={navigateTo}
-        currentCurrency={currentCurrency}
-        onCurrencyChange={(code) => setCurrentCurrency(code)}
-        onOpenBooking={(service) => handleOpenBooking(service || 'all_in_one')}
-        onOpenConcierge={() => setIsConciergeOpen(true)}
+        onNavigate={handleNavigate}
+        onOpenDownload={() => setIsDownloadModalOpen(true)}
       />
 
-      <main className="flex-1 w-full">
-        {/* VIEW 1: DEDICATED CAB SERVICE PAGE */}
-        {currentPage === 'cab' && (
-          <CabServicePage
-            currentCurrency={currentCurrency}
-            onNavigateHome={() => navigateTo('home')}
-            onNavigateEvents={() => navigateTo('events')}
-            onOpenConcierge={() => setIsConciergeOpen(true)}
-            onOpenBookingModal={(prefillId) => handleOpenBooking('cab', prefillId)}
+      {/* Main Content Area */}
+      <main className="flex-1 bg-white">
+        {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
+        {currentPage === 'cabs' && <CabServicesPage onNavigate={handleNavigate} />}
+        {currentPage === 'hospitality' && (
+          <HospitalityPage onNavigate={handleNavigate} />
+        )}
+        {currentPage === 'events' && <EventsPage onNavigate={handleNavigate} />}
+        {currentPage === 'cars' && (
+          <CarsPage
+            selectedCarId={selectedCarId}
+            onNavigate={handleNavigate}
           />
         )}
-
-        {/* VIEW 2: DEDICATED EVENT MANAGEMENT PAGE */}
-        {currentPage === 'events' && (
-          <EventManagementPage
-            currentCurrency={currentCurrency}
-            onNavigateHome={() => navigateTo('home')}
-            onNavigateCab={() => navigateTo('cab')}
-            onOpenConcierge={() => setIsConciergeOpen(true)}
-            onOpenBookingModal={(prefillId) => handleOpenBooking('event', prefillId)}
-          />
-        )}
-
-        {/* VIEW 3: SANCTUARY HOME (ALL-IN-ONE OVERVIEW) */}
-        {currentPage === 'home' && (
-          <>
-            {/* Hero Section with Live Reservation & Quotation Bar */}
-            <HeroSection
-              currentCurrency={currentCurrency}
-              onOpenBooking={handleOpenBooking}
-            />
-
-            {/* Section 01: Royal Fleet & Chauffeur Mobility */}
-            <FleetSection
-              currentCurrency={currentCurrency}
-              onSelectVehicle={handleSelectVehicle}
-              onNavigateToCabPage={() => navigateTo('cab')}
-            />
-
-            {/* Section 02: Palatial Hospitality Suites & Heritage Stays */}
-            <HospitalitySection
-              currentCurrency={currentCurrency}
-              onSelectProperty={handleSelectProperty}
-            />
-
-            {/* Section 03: Grand Event & Royal Wedding Direction */}
-            <EventsSection
-              currentCurrency={currentCurrency}
-              onSelectEvent={handleSelectEvent}
-              onNavigateToEventsPage={() => navigateTo('events')}
-            />
-
-            {/* The Trinity: All-In-One Unified Solution */}
-            <TrinityBundleSection
-              currentCurrency={currentCurrency}
-              onOpenBookingAllInOne={() => handleOpenBooking('all_in_one')}
-            />
-
-            {/* Proof & Patron Testimony */}
-            <TestimonialsSection />
-          </>
-        )}
+        {currentPage === 'about' && <AboutPage onNavigate={handleNavigate} />}
+        {currentPage === 'contact' && <ContactPage onNavigate={handleNavigate} />}
       </main>
 
-      {/* Royal Footer */}
-      <Footer
-        onOpenBooking={() => handleOpenBooking('all_in_one')}
-        onOpenConcierge={() => setIsConciergeOpen(true)}
-      />
+      {/* Global Footer */}
+      <Footer onNavigate={handleNavigate} />
 
-      {/* Interactive Reservation & Quoting Engine Modal */}
-      <BookingModal
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-        currentCurrency={currentCurrency}
-        initialServiceType={bookingServiceType}
-        initialPreselectedId={bookingPrefillId}
-      />
-
-      {/* 24/7 Global Concierge Drawer */}
-      <ConciergeDrawer
-        isOpen={isConciergeOpen}
-        onClose={() => setIsConciergeOpen(false)}
+      {/* Download Modal for GitHub Pages & React Source ZIP */}
+      <DownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
       />
     </div>
   );

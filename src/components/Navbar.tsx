@@ -1,228 +1,179 @@
 import React, { useState } from 'react';
-import { Menu, X, ChevronDown, Phone, Car, Calendar, Sparkles } from 'lucide-react';
-import { CurrencyCode, NavigationPage } from '../types';
-import { CURRENCIES } from '../data/mockData';
+import { PageId } from '../types';
+import { Menu, X, Phone, Car, ChevronRight, Download } from 'lucide-react';
 
 interface NavbarProps {
-  currentPage: NavigationPage;
-  onNavigate: (page: NavigationPage) => void;
-  currentCurrency: CurrencyCode;
-  onCurrencyChange: (code: CurrencyCode) => void;
-  onOpenBooking: (prefillService?: 'cab' | 'hospitality' | 'event' | 'all_in_one') => void;
-  onOpenConcierge: () => void;
+  currentPage: PageId;
+  onNavigate: (page: PageId, carId?: string) => void;
+  onOpenDownload?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
-  currentPage,
-  onNavigate,
-  currentCurrency,
-  onCurrencyChange,
-  onOpenBooking,
-  onOpenConcierge,
-}) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, onOpenDownload }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currencyDropdownOpen, setCurrencyDropdownOpen] = useState(false);
 
-  const handleNavClick = (page: NavigationPage, anchor?: string) => {
+  const navLinks: { id: PageId; label: string }[] = [
+    { id: 'home', label: 'Home' },
+    { id: 'cabs', label: 'Cab Services' },
+    { id: 'hospitality', label: 'Hospitality' },
+    { id: 'events', label: 'Event Management' },
+    { id: 'cars', label: 'Cars & Fleet' },
+    { id: 'about', label: 'About Us' },
+    { id: 'contact', label: 'Contact' },
+  ];
+
+  const handleLinkClick = (pageId: PageId) => {
+    onNavigate(pageId);
     setMobileMenuOpen(false);
-    onNavigate(page);
-    if (anchor) {
-      setTimeout(() => {
-        const target = document.querySelector(anchor);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 50);
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#0B0F19]/95 backdrop-blur-md border-b border-[#1E293B]">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-6 px-4 sm:px-6 py-3.5">
-        {/* Zone 1: Brand title */}
-        <button
-          onClick={() => handleNavClick('home')}
-          className="flex items-center gap-2.5 text-left cursor-pointer group"
-        >
-          <div className="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-600/20 group-hover:bg-emerald-500 transition-colors">
-            <Car className="w-5 h-5" />
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs transition-all">
+      {/* Top micro-bar for direct contact info */}
+      <div className="bg-[#071830] text-slate-200 text-xs py-1.5 px-4 sm:px-8 border-b border-slate-800/40">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4 text-xs font-normal">
+            <span className="hidden sm:inline text-slate-400">Anchor Point Hospitality Private Limited · Chennai</span>
+            <span className="text-sky-300 font-medium">24/7 Dispatch Desk</span>
           </div>
-          <div>
-            <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-white block leading-none">
-              CityConnect
+          <div className="flex items-center gap-5 text-xs">
+            <a
+              href="tel:+919003163335"
+              className="flex items-center gap-1.5 text-slate-200 hover:text-sky-300 transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5 text-sky-400" />
+              <span>+91 90031 63335</span>
+            </a>
+           
+            
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation (3-Zone Top Bar Contract) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-18 flex items-center justify-between gap-6">
+        {/* Zone 1: Single element brand wordmark with anchor icon */}
+        <button
+          onClick={() => handleLinkClick('home')}
+          className="flex items-center gap-3 text-left focus:outline-none cursor-pointer group shrink-0"
+          aria-label="Anchor Point Home"
+        >
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#106eea] to-[#0ea5e9] p-2 flex items-center justify-center shadow-xs">
+            <img
+              src="./assets/logo_icon.png"
+              alt="Anchor Point Icon"
+              className="w-full h-full object-contain brightness-0 invert"
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.style.display = 'none';
+              }}
+            />
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-xl tracking-tight text-[#071830] font-sans">
+                Anchor <span className="text-[#106eea]">Point</span>
+              </span>
+            </div>
+            <span className="text-[10px] tracking-wider uppercase text-slate-600 font-medium">
+              Mobility · Hospitality · Events
             </span>
-            <span className="text-[11px] text-emerald-400 font-medium">Cabs · Stays · Events</span>
           </div>
         </button>
 
-        {/* Zone 2: Navigation Links */}
-        <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-sm font-medium">
-          <button
-            onClick={() => handleNavClick('home')}
-            className={`transition-colors whitespace-nowrap shrink-0 pb-1 border-b-2 cursor-pointer ${
-              currentPage === 'home'
-                ? 'text-white border-emerald-500 font-semibold'
-                : 'text-slate-300 border-transparent hover:text-white hover:border-slate-600'
-            }`}
-          >
-            All-In-One Home
-          </button>
-
-          <button
-            onClick={() => handleNavClick('cab')}
-            className={`transition-colors whitespace-nowrap shrink-0 pb-1 border-b-2 cursor-pointer ${
-              currentPage === 'cab'
-                ? 'text-white border-emerald-500 font-semibold'
-                : 'text-slate-300 border-transparent hover:text-white hover:border-slate-600'
-            }`}
-          >
-            Cab Service
-          </button>
-
-          <button
-            onClick={() => handleNavClick('events')}
-            className={`transition-colors whitespace-nowrap shrink-0 pb-1 border-b-2 cursor-pointer ${
-              currentPage === 'events'
-                ? 'text-white border-emerald-500 font-semibold'
-                : 'text-slate-300 border-transparent hover:text-white hover:border-slate-600'
-            }`}
-          >
-            Event Management
-          </button>
-
-          <button
-            onClick={() => handleNavClick('home', '#hospitality')}
-            className="text-slate-300 border-b-2 border-transparent hover:text-white hover:border-slate-600 transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer"
-          >
-            Hotel Stays
-          </button>
-
-          <button
-            onClick={() => handleNavClick('home', '#bundle')}
-            className="text-slate-300 border-b-2 border-transparent hover:text-white hover:border-slate-600 transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer"
-          >
-            Package Combos
-          </button>
+        {/* Zone 2: 4-7 single-line concise navigation links */}
+        <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+          {navLinks.map((link) => {
+            const isActive = currentPage === link.id;
+            return (
+              <button
+                key={link.id}
+                onClick={() => handleLinkClick(link.id)}
+                className={`px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors rounded-md relative cursor-pointer ${
+                  isActive
+                    ? 'text-[#106eea] font-semibold bg-sky-50/70'
+                    : 'text-slate-600 hover:text-[#071830] hover:bg-slate-50'
+                }`}
+              >
+                {link.label}
+                {isActive && (
+                  <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-[#106eea] rounded-full" />
+                )}
+              </button>
+            );
+          })}
         </nav>
 
-        {/* Zone 3: Currency, Hotline & Booking Button */}
-        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-          {/* Currency dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setCurrencyDropdownOpen(!currencyDropdownOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-200 bg-[#151D2D] border border-slate-700 rounded-lg hover:border-emerald-500/60 transition-colors whitespace-nowrap shrink-0"
-              title="Change Currency"
-            >
-              <span>{currentCurrency}</span>
-              <ChevronDown className="w-3.5 h-3.5 text-emerald-400" />
-            </button>
+        {/* Zone 3: 1 Primary CTA Button + Download ZIP Button */}
+        <div className="hidden sm:flex items-center gap-2.5 shrink-0">
+        
 
-            {currencyDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-32 bg-[#151D2D] border border-slate-700 rounded-lg shadow-xl py-1 z-50">
-                {Object.keys(CURRENCIES).map((code) => (
-                  <button
-                    key={code}
-                    onClick={() => {
-                      onCurrencyChange(code as CurrencyCode);
-                      setCurrencyDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-1.5 text-xs transition-colors flex items-center justify-between ${
-                      currentCurrency === code
-                        ? 'bg-emerald-600/30 text-white font-semibold'
-                        : 'text-slate-300 hover:bg-[#1E293B] hover:text-white'
-                    }`}
-                  >
-                    <span>{code}</span>
-                    <span className="text-slate-400">{CURRENCIES[code].symbol}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+         
+        </div>
 
-          {/* Quick Help Line */}
-          <button
-            onClick={onOpenConcierge}
-            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-[#151D2D] border border-slate-700 rounded-lg hover:border-slate-500 transition-colors whitespace-nowrap shrink-0"
-          >
-            <Phone className="w-3.5 h-3.5 text-emerald-400" />
-            <span>24/7 Helpline</span>
-          </button>
-
-          {/* Primary Action Button */}
-          <button
-            onClick={() => onOpenBooking('all_in_one')}
-            className="px-4 py-2 text-xs sm:text-sm font-semibold tracking-wide text-white bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] rounded-lg transition-all shadow-md shadow-emerald-600/20 whitespace-nowrap shrink-0"
-          >
-            Book Online
-          </button>
-
-          {/* Mobile hamburger */}
+        {/* Mobile menu trigger */}
+        <div className="flex items-center lg:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-slate-300 hover:text-white rounded-lg transition-colors"
-            aria-label="Toggle navigation"
+            className="p-2 text-slate-700 hover:text-[#106eea] focus:outline-none cursor-pointer"
+            aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile navigation dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden px-6 pt-3 pb-6 bg-[#0F1422] border-b border-slate-800 space-y-3">
-          <nav className="flex flex-col gap-2.5 text-sm font-medium text-slate-300">
+        <div className="lg:hidden bg-white border-b border-slate-200 px-5 pt-3 pb-6 shadow-xl animate-in slide-in-from-top-2">
+          <div className="flex flex-col gap-1.5 mb-4">
+            {navLinks.map((link) => {
+              const isActive = currentPage === link.id;
+              return (
+                <button
+                  key={link.id}
+                  onClick={() => handleLinkClick(link.id)}
+                  className={`flex items-center justify-between w-full px-4 py-2.5 rounded-lg text-left text-sm font-medium cursor-pointer transition-colors ${
+                    isActive
+                      ? 'bg-sky-50 text-[#106eea] font-semibold'
+                      : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <span>{link.label}</span>
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
             <button
-              onClick={() => handleNavClick('home')}
-              className={`py-1.5 text-left transition-colors ${
-                currentPage === 'home' ? 'text-emerald-400 font-semibold' : 'hover:text-white'
-              }`}
+              onClick={() => handleLinkClick('cars')}
+              className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-white bg-[#106eea] rounded-lg shadow-sm"
             >
-              All-In-One Home
+              <Car className="w-4 h-4" />
+              <span>Explore All Available Cars</span>
             </button>
-            <button
-              onClick={() => handleNavClick('cab')}
-              className={`py-1.5 text-left transition-colors ${
-                currentPage === 'cab' ? 'text-emerald-400 font-semibold' : 'hover:text-white'
-              }`}
+            {onOpenDownload && (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenDownload();
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <Download className="w-4 h-4 text-[#106eea]" />
+               
+              </button>
+            )}
+            <a
+              href="tel:+919003163335"
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200"
             >
-              Cab Service (Dedicated Page)
-            </button>
-            <button
-              onClick={() => handleNavClick('events')}
-              className={`py-1.5 text-left transition-colors ${
-                currentPage === 'events' ? 'text-emerald-400 font-semibold' : 'hover:text-white'
-              }`}
-            >
-              Event Management (Dedicated Page)
-            </button>
-            <button
-              onClick={() => handleNavClick('home', '#hospitality')}
-              className="py-1.5 text-left hover:text-white transition-colors"
-            >
-              Comfortable Hotel Stays
-            </button>
-            <button
-              onClick={() => handleNavClick('home', '#bundle')}
-              className="py-1.5 text-left hover:text-white transition-colors"
-            >
-              Combined Value Packages
-            </button>
-          </nav>
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenConcierge();
-              }}
-              className="flex items-center gap-2 text-xs text-emerald-400 font-medium"
-            >
-              <Phone className="w-4 h-4" />
-              <span>Call 24/7 Helpline: 1800-202-3000</span>
-            </button>
+              <Phone className="w-4 h-4 text-[#106eea]" />
+              <span>Call Us: +91 90031 63335</span>
+            </a>
           </div>
         </div>
       )}
